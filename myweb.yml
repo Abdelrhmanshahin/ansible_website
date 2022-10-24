@@ -1,0 +1,38 @@
+---
+- name: this play for web site setup
+  hosts: webserver
+  become: true
+  tasks:
+   - name: install apache
+     yum:
+      name: httpd
+   - name: copy the data file of web site
+     copy:
+      src: index.html
+      dest: /var/www/html/index.html
+   - name: start and enable apache service
+     service:
+      name: httpd
+      state: started
+      enabled: true
+   - name: start firewalld
+     service:
+      name: firewalld
+      state: started
+      enabled: true
+   - name: open firewall port
+     firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+      immediate: true
+- name: this play for testing tha web site
+  hosts: localhost
+  tasks:
+   - name: test web url
+     uri:
+      url: http://webserver
+      return_content: yes
+
+
+
